@@ -141,7 +141,7 @@ class SketchRNN(object):
         strokes = np.zeros((seq_len, 5), dtype=np.float32)
 
         for i in range(seq_len):
-            concat_ratio = tf.concat([prev_x.reshape((1, 1, 5)), 5], -1)
+            concat_ratio = tf.concat([prev_x.reshape((1, 1, 5)), tf.constant(5, shape=(1, 1, 5))], -1)
             
             outouts, cell_h, cell_c = self.models["decoder"](
                 [concat_ratio, z, cell_h, cell_c]
