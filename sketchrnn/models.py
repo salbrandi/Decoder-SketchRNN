@@ -112,9 +112,12 @@ class SketchRNN(object):
 
         z_out, mu_out, sigma_out = self.models["encoder"](encoder_input)
 
-        if hps["unconditional"]:
-            z_out = tf.zeros(shape=z_out.shape())
         init_h, init_c = self.models["initial_state"](z_out)
+        
+        if hps["unconditional"]:
+            init_h = tf.zeros(shape=init_h.shape)
+            init_c = tf.zeros(shape=init_c.shape)
+
 
         output, _, _ = self.models["decoder"]([decoder_input, z_out, init_h, init_c])
 
