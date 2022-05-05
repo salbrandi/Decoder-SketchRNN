@@ -81,8 +81,14 @@ class SketchRNN(object):
         )
 
         tile_z = tf.tile(tf.expand_dims(z_input, 1), [1, tf.shape(decoder_input)[1], 1])
-        tile_ratio = tf.constant(0.5, shape=[1, tf.shape(decoder_input)[1], 1])
-        decoder_full_input = tf.concat([decoder_input, tile_z, tile_ratio], -1)
+        tile_ratio = tf.constant(5, shape=tile_z)
+        decoder_full_input = tf.concat([decoder_input, tile_z], -1)
+
+        if hps["unconditional"]:
+            decoder_full_input = decoder_input
+        
+        decoder_full_input = tf.concat([decoder_input, tile_ratio], -1)
+        
 
         decoder_output, cell_h, cell_c = decoder_lstm(
             decoder_full_input, initial_state=[initial_h_input, initial_c_input]
@@ -105,6 +111,9 @@ class SketchRNN(object):
         decoder_input = K.layers.Input(shape=(None, 5), name="decoder_input")
 
         z_out, mu_out, sigma_out = self.models["encoder"](encoder_input)
+
+        if hps["unconditional"]:
+            z_out = tf.zeros(shape=z_out.shape())
         init_h, init_c = self.models["initial_state"](z_out)
 
         output, _, _ = self.models["decoder"]([decoder_input, z_out, init_h, init_c])
