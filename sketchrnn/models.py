@@ -12,7 +12,6 @@ class SketchRNN(object):
         self.models["initial_state"] = self._build_initial_state()
         self.models["decoder"] = self._build_decoder()
         self.models["full"] = self._build_model()
-        self.conditional = hps["conditional"]
 
     def _build_encoder(self):
         hps = self.hps
@@ -81,7 +80,7 @@ class SketchRNN(object):
         )
 
         tile_z = tf.tile(tf.expand_dims(z_input, 1), [1, tf.shape(decoder_input)[1], 1])
-        tile_ratio = tf.constant(5, shape=tile_z)
+        tile_ratio = tf.constant(5, shape=[1, tf.shape(decoder_input)[1], 1])
         decoder_full_input = tf.concat([decoder_input, tile_z], -1)
 
         if hps["unconditional"]:
