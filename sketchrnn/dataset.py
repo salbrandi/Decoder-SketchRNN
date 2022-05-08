@@ -96,7 +96,7 @@ def make_train_dataset(
     train_dataset = tf.data.Dataset.from_generator(
         data_gen(data, scale_factor),
         output_types=tf.float32,
-        output_shapes=(None, seq_len + 1, 5),
+        output_shapes=(None, seq_len + 1, 6),
         args=[batch_size, seq_len, random_scale_factor, augment_prob],
     )
     train_dataset = train_dataset.map(
