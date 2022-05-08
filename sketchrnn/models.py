@@ -113,9 +113,9 @@ class SketchRNN(object):
 
         init_h, init_c = self.models["initial_state"](z_out)
         
-        if hps["unconditional"]:
-            init_h = tf.zeros(shape=init_h.shape)
-            init_c = tf.zeros(shape=init_c.shape)
+        # if hps["unconditional"]:
+        #     init_h = tf.zeros(shape=init_h.shape)
+        #     init_c = tf.zeros(shape=init_c.shape)
 
 
         output, _, _ = self.models["decoder"]([decoder_input, z_out, init_h, init_c])
@@ -130,7 +130,7 @@ class SketchRNN(object):
         self.models["full"].load_weights(path)
         print("Loaded Weights From: {}".format(path))
 
-    def sample(self, temperature=1.0, greedy=False, z=None):
+    def sample(self, temperature=1.0, greedy=False, z=None, aspect=1):
         seq_len = self.hps["max_seq_len"]
         if z is None:
             z = np.random.randn(1, self.hps["z_size"]).astype("float32")
