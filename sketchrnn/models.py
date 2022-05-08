@@ -163,7 +163,7 @@ class SketchRNN(object):
                 greedy,
             )
 
-            strokes[i] = [next_x1, next_x2, 0, 0, 0]
+            strokes[i] = [next_x1, next_x2, 0, 0, 0, aspect]
             strokes[i, idx_eos + 2] = 1
 
             prev_x = strokes[i]
