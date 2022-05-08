@@ -16,7 +16,7 @@ class SketchRNN(object):
     def _build_encoder(self):
         hps = self.hps
         encoder_input = K.layers.Input(
-            shape=(hps["max_seq_len"], 5), name="encoder_input"
+            shape=(hps["max_seq_len"], 6), name="encoder_input"
         )
 
         encoder_lstm_cell = K.layers.LSTM(
