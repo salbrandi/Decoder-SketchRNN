@@ -45,15 +45,8 @@ def augment(data, prob):
 
 def pad(data, seq_len):
     l = len(data)
-
-    # get min and max boundaries for the sketch
-    vertices = data[:, :-1].cumsum(axis=0, dtype=np.float32) * -1
-    if len(vertices) > 0:
-        (minx, miny), (maxx, maxy) = vertices.min(0), vertices.max(0)
-        aspect = (maxy - miny) / (maxx - minx)
-
-    res = np.pad(data, [(1, seq_len - l), (0, 2)], "constant")
-    res[0, :] = [0, 0, 1, 0, 0]
+    res = np.pad(data, [(1, seq_len - l), (0, 3)], "constant")
+    res[0, :] = [0, 0, 1, 0, 0, 0]
     res[1 : l + 1, 3] = data[:, 2]
     res[1 : l + 1, 2] = 1 - res[1 : l + 1, 3]
     res[l + 1 :, 4] = 1
@@ -61,11 +54,21 @@ def pad(data, seq_len):
     
     return res
 
+def add_aspect(data):
+    vertices = data[:, :2].cumsum(axis=0, dtype=np.float32) * -1
+    if len(vertices) > 0:
+        (minx, miny), (maxx, maxy) = vertices.min(0), vertices.max(0)
+        aspect = (maxy - miny) / (maxx - minx)
+    res = data.copy()
+    res[:, 5] = aspect
+    return res
+
 
 def preprocess(d, seq_len, eps, prob):
     d = random_scale(d, eps)
     d = augment(d, prob)
-    return pad(d, seq_len)
+    d = pad(d, seq_len)
+    return add_aspect(d)
 
 
 def data_gen(data, scale_factor):

@@ -66,7 +66,7 @@ class SketchRNN(object):
 
     def _build_decoder(self):
         hps = self.hps
-        decoder_input = K.layers.Input(shape=(None, 5), name="decoder_input")
+        decoder_input = K.layers.Input(shape=(None, 6), name="decoder_input")
         z_input = K.layers.Input(shape=(hps["z_size"],), name="z_input")
         initial_h_input = K.layers.Input(shape=(hps["dec_rnn_size"],), name="init_h")
         initial_c_input = K.layers.Input(shape=(hps["dec_rnn_size"],), name="init_c")
@@ -105,9 +105,9 @@ class SketchRNN(object):
     def _build_model(self):
         hps = self.hps
         encoder_input = K.layers.Input(
-            shape=(hps["max_seq_len"], 5), name="encoder_input"
+            shape=(hps["max_seq_len"], 6), name="encoder_input"
         )
-        decoder_input = K.layers.Input(shape=(None, 5), name="decoder_input")
+        decoder_input = K.layers.Input(shape=(None, 6), name="decoder_input")
 
         z_out, mu_out, sigma_out = self.models["encoder"](encoder_input)
 
@@ -135,16 +135,15 @@ class SketchRNN(object):
         if z is None:
             z = np.random.randn(1, self.hps["z_size"]).astype("float32")
 
-        prev_x = np.array([0, 0, 1, 0, 0], dtype=np.float32)
+        prev_x = np.array([0, 0, 1, 0, 0, aspect], dtype=np.float32)
         cell_h, cell_c = self.models["initial_state"](z)
 
-        strokes = np.zeros((seq_len, 5), dtype=np.float32)
+        strokes = np.zeros((seq_len, 6), dtype=np.float32)
 
         for i in range(seq_len):
-            concat_ratio = tf.concat([prev_x.reshape((1, 1, 5)), tf.constant(5, shape=(1, 1, 1))], -1)
             
             outouts, cell_h, cell_c = self.models["decoder"](
-                [concat_ratio, z, cell_h, cell_c]
+                [prev_x.reshape((1, 1, 6)), z, cell_h, cell_c]
             )
 
             o_pi, o_mu1, o_mu2, o_sigma1, o_sigma2, o_corr, o_pen = get_mixture_coef(
