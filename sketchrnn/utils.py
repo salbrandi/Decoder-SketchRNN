@@ -68,9 +68,10 @@ def update_progress(progress, bar_length=20):
     print(text)
 
 
-def make_mpl_path(strokes):
+def make_mpl_path(strokes, square=False):
     vertices = strokes[:, :-1].cumsum(axis=0, dtype=np.float32) * -1
     if len(vertices) > 0:
+      if square:
         (minx, miny), (maxx, maxy) = vertices.min(0), vertices.max(0)
         aspect = (maxy - miny) / (maxx - minx)
 
